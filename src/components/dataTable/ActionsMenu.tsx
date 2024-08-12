@@ -20,7 +20,7 @@ const ActionsMenu: React.FC<ActionsMenuProps> = ({ row, onUpdateStatus }) => {
   };
 
   const handleStatusChange = (newStatus: Row['status']) => {
-    onUpdateStatus(row.idInvoice, newStatus);
+    onUpdateStatus(row.id, newStatus);
     handleClose();
   };
 
