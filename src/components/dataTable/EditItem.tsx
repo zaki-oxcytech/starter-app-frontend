@@ -27,7 +27,7 @@ export const EditItem = () => {
     });
     const [details, setDetails] = useState(rowData?.details);
 
-    const editUrl = import.meta.env.VITE_API_URL + `form//updateProfile/${id}`;
+    const editUrl = import.meta.env.VITE_API_URL + `form/updateProfile/${id}`;
 
     const handleSelectChange = (event: SelectChangeEvent<typeof teamMember>) => {
       const {
