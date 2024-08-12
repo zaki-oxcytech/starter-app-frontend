@@ -44,6 +44,13 @@ export const EditItem = () => {
       setDate(dateString);
     };
 
+    const handleCostChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value;
+      const numericValue = value ? Number(value) : 0; 
+  
+      setCost(numericValue);
+  };
+
     const handleEditData = async (e: FormEvent) =>{
         e.preventDefault();
         const isoDate = new Date(date).toISOString();
@@ -131,7 +138,7 @@ export const EditItem = () => {
                 size="small"
                 placeholder="Project Cost"
                 value={cost}
-                onChange={(e) => setCost(e.target.value)}
+                onChange={handleCostChange}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
