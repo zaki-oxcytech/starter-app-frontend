@@ -1,7 +1,7 @@
 import { Row } from './types';
 
 export const rows: Row[] = [
-  { idInvoice: 112325949, date: '2024-07-01', name: 'John Doe', email: 'john.doe@example.com', serviceType: 'Consulting', status: 'Pending' },
+  { idInvoice: 0, date: '2024-07-01', name: 'John Doe', email: 'john.doe@example.com', serviceType: 'Consulting', status: 'Pending' },
   { idInvoice: 2, date: '2024-07-02', name: 'Jane Smith', email: 'jane.smith@example.com', serviceType: 'Development', status: 'Complete' },
   { idInvoice: 3, date: '2024-07-03', name: 'Bob Johnson', email: 'bob.johnson@example.com', serviceType: 'Design', status: 'Pending' },
   { idInvoice: 4, date: '2024-07-04', name: 'Alice Brown', email: 'alice.brown@example.com', serviceType: 'Marketing', status: 'Cancel' },

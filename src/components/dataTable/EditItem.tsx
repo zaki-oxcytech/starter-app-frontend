@@ -1,112 +1,76 @@
-import React, { FormEvent, useState } from "react";
-import { Box, TextField, Button, Grid, Typography, FormControl, Select, MenuItem, Chip } from "@mui/material";
-import { SelectChangeEvent } from "@mui/material/Select";
-import axios from "axios";
+// import React from 'react';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
+import { Box, TextField, Button, Grid, Typography, FormControl, Select, MenuItem, Chip, SelectChangeEvent } from "@mui/material";
+import { useState, FormEvent } from 'react';
+import axios from 'axios';
 
-interface FormData{
-  name: string;
-  email: string;
-  serviceType: string;
-  projectName: string;
-  teamLeader: string;
-  teamMember: string[];
-  cost: number | null;
-  size: string;
-  priority: string;
-  projectType: string;
-  details: string;
-  date: Date | null;
-}
+export const EditItem = () => {
+    const location = useLocation();
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const { state: rowData } = location;
+    const [projectName, setProjectName] = useState(rowData?.projectName);
+    const [name, setName] = useState(rowData?.name);
+    const [email, setEmail] = useState(rowData?.email);
+    const [cost, setCost] = useState(rowData?.cost);
+    const [projectType, setProjectType] = useState(rowData?.projectType);
+    const [serviceType, setServiceType] = useState(rowData?.serviceType);
+    const [priority, setPriority] = useState(rowData?.priority);
+    const [teamLeader, setTeamLeader] = useState(rowData?.teamLeader);
+    const [teamMember, setTeamMember] = useState<string[]>(rowData?.teamMember || []);
+    const [size, setSize] = useState(rowData?.size);
+    const [date, setDate] = useState(() => {
+      if(rowData.date){
+        return new Date(rowData.date).toISOString().split('T')[0];
+      }
+      return '';
+    });
+    const [details, setDetails] = useState(rowData?.details);
 
-// const formatDate = (date: Date | null): string => {
-//   if (!date) return '';
-//   const day = String(date.getDate()).padStart(2, '0');
-//   const month = String(date.getMonth() + 1).padStart(2, '0');
-//   const year = date.getFullYear();
-//   return `${day}-${month}-${year}`;
-// };
+    const editUrl = import.meta.env.VITE_API_URL + `form//updateProfile/${id}`;
 
-const FormComponent: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    email: "",
-    serviceType: "",
-    projectName: "",
-    teamLeader: "",
-    teamMember: [],
-    cost: null,
-    size: "",
-    priority: "",
-    projectType: "",
-    details: "",
-    date: null
-  });
-
-  const formUrl = import.meta.env.VITE_API_URL + "form/form-details"
-
-  const handleChange = (key: keyof FormData, value: string) => {
-    setFormData(prevState => ({
-        ...prevState,
-        [key]: value,
-    }));
-  };
-
-  const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
-    const {
-        target: { value },
-    } = event;
-
-    setFormData((prevData) => ({
-        ...prevData,
-        teamMember: typeof value === 'string' ? value.split(',') : value,
-    }));
-  };
-
-
-  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedDate = event.target.value ? new Date(event.target.value) : null;
-    setFormData((prevData) => ({
-        ...prevData,
-        date: selectedDate,
-    }));
-  };
-
-  const handleCostChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    const numericValue = value ? Number(value) : 0; 
-
-    setFormData((prevData) => ({
-        ...prevData,
-        cost: numericValue,
-    }));
-};
-
-  const handleSubmitForm = async (e: FormEvent) => {
-    e.preventDefault();
-    try{
-      const response = await axios.post(formUrl,formData);
-
-      console.log("response", response);
-      setFormData({
-        name: "",
-        email: "",
-        serviceType: "",
-        projectName: "",
-        teamLeader: "",
-        teamMember: [],
-        cost: null,
-        size: "",
-        priority: "",
-        projectType: "",
-        details: "",
-        date: null
-      });
-    }
-    catch(err){
-      console.log(`There was an error while login:${err}`);
-    }
-  }
+    const handleSelectChange = (event: SelectChangeEvent<typeof teamMember>) => {
+      const {
+          target: { value },
+      } = event;
   
+      setTeamMember(
+          typeof value === 'string' ? value.split(',') : value,
+      );
+  };
+
+    const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      const dateString = event.target.value;
+      setDate(dateString);
+    };
+
+    const handleEditData = async (e: FormEvent) =>{
+        e.preventDefault();
+        const isoDate = new Date(date).toISOString();
+        await axios.patch(editUrl, {
+            projectName:projectName,
+            name: name,
+            email: email,
+            cost: cost,
+            projectType: projectType,
+            serviceType:serviceType,
+            priority: priority,
+            teamLeader: teamLeader,
+            teamMember: teamMember,
+            size: size,
+            date: isoDate,
+            details: details
+        })
+        .then((response) => {
+            console.log(response, "edit form Response");
+            alert("Form editted successfully!!");
+            navigate("/table");
+        })
+        .catch((err) => {
+            console.log(err, "error submitting edit form");
+        })
+    }
+    
   return (
     <Box
       sx={{
@@ -123,11 +87,11 @@ const FormComponent: React.FC = () => {
     >
       <Box sx={{ bgcolor: "#F5F5F8", p: 1 }}>
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-          Add Form
+          Edit Form
         </Typography>
       </Box>
       <Box sx={{ bgcolor: "#FFFFFF", borderRadius: 5, p: 3 }}>
-        <form onSubmit={handleSubmitForm}>
+        <form onSubmit={handleEditData}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <Typography variant="body2" sx={{ mb: 1 }}>Project Name</Typography>
@@ -135,9 +99,8 @@ const FormComponent: React.FC = () => {
                 fullWidth
                 size="small"
                 placeholder="Project Name"
-                required
-                value={formData.projectName}
-                onChange={(e) => handleChange('projectName', e.target.value)}
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -146,9 +109,8 @@ const FormComponent: React.FC = () => {
                 fullWidth
                 size="small"
                 placeholder="Client Name"
-                required
-                value={formData.name}
-                onChange={(e) => handleChange('name', e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
@@ -158,9 +120,8 @@ const FormComponent: React.FC = () => {
                 size="small"
                 placeholder="Email"
                 InputLabelProps={{ shrink: true }}
-                required
-                value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
@@ -169,36 +130,35 @@ const FormComponent: React.FC = () => {
                 fullWidth
                 size="small"
                 placeholder="Project Cost"
-                required
-                value={formData.cost}
-                onChange={handleCostChange}
+                value={cost}
+                onChange={(e) => setCost(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
               <FormControl fullWidth size="small" required>
                 <Typography variant="body2" sx={{ mb: 1 }}>Project Type</Typography>
                 <Select
-                  defaultValue=""
                   label="Project Type"
-                  value={formData.projectType}
-                  onChange={(e) => handleChange('projectType', e.target.value)}
+                  defaultValue=""
+                  value={projectType}
+                  onChange={(e) => setProjectType(e.target.value)}
                 >
-                  <MenuItem value="" disabled>Choose...</MenuItem>
+                  {/* <MenuItem value="" disabled>Choose...</MenuItem> */}
                   <MenuItem value="Hourly">Hourly</MenuItem>
                   <MenuItem value="Fixed">Fixed</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth size="small" required>
+              <FormControl fullWidth size="small">
                 <Typography variant="body2" sx={{ mb: 1 }}>Service Type</Typography>
                 <Select
                   defaultValue=""
                   label="Category"
-                  value={formData.serviceType}
-                  onChange={(e) => handleChange('serviceType', e.target.value)}
+                  value={serviceType}
+                  onChange={(e) => setServiceType(e.target.value)}
                 >
-                  <MenuItem value="" disabled>Choose...</MenuItem>
+                  {/* <MenuItem value="" disabled>Choose...</MenuItem> */}
                   <MenuItem value="Developer">Developer</MenuItem>
                   <MenuItem value="Designer">Designer</MenuItem>
                   <MenuItem value="Analyst">Analyst</MenuItem>
@@ -208,15 +168,15 @@ const FormComponent: React.FC = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth size="small" required>
+              <FormControl fullWidth size="small">
                 <Typography variant="body2" sx={{ mb: 1 }}>Priority</Typography>
                 <Select
                   defaultValue=""
                   label="Priority"
-                  value={formData.priority}
-                  onChange={(e) => handleChange('priority', e.target.value)}
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value)}
                 >
-                  <MenuItem value="" disabled>Choose...</MenuItem>
+                  {/* <MenuItem value="" disabled>Choose...</MenuItem> */}
                   <MenuItem value="Urgent">Urgent</MenuItem>
                   <MenuItem value="High">High</MenuItem>
                   <MenuItem value="Medium">Medium</MenuItem>
@@ -225,14 +185,17 @@ const FormComponent: React.FC = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth size="small" required>
+              <FormControl fullWidth size="small">
                 <Typography variant="body2" sx={{ mb: 1 }}>Select Team Leader</Typography>
                 <Select
                   defaultValue=""
                   label="Select Team Leader"
-                  value={formData.teamLeader}
-                  onChange={(e) => handleChange('teamLeader', e.target.value)}
+                  value={teamLeader}
+                  onChange={(e) => setTeamLeader(e.target.value)}
                 >
+                  <MenuItem value="Zahid Khan">Zahid Khan</MenuItem>
+                  <MenuItem value="Raviraj Navale">Raviraj Navale</MenuItem>
+                  <MenuItem value="Owais Zarger">Owais Zarger</MenuItem>
                   <MenuItem value="Nathan Cooper">Nathan Cooper</MenuItem>
                   <MenuItem value="Owen Davis">Owen Davis</MenuItem>
                   <MenuItem value="Zoey Jenkins">Zoey Jenkins</MenuItem>
@@ -245,9 +208,8 @@ const FormComponent: React.FC = () => {
                 <Typography variant="body2" sx={{ mb: 1 }}>Select Members</Typography>
                 <Select
                   multiple
-                  value={formData.teamMember}
+                  value={teamMember}
                   onChange={handleSelectChange}
-                  // renderValue={(selected) => (selected as string[]).join(', ')}
                   renderValue={(selected) => (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
                       {selected.map((value) => (
@@ -256,6 +218,8 @@ const FormComponent: React.FC = () => {
                     </Box>
                   )}
                 >
+                  <MenuItem value="Furqan Shaikh">Furqan Shaikh</MenuItem>
+                  <MenuItem value="Mohammad Rehan">Mohammad Rehan</MenuItem>
                   <MenuItem value="Nathan Cooper">Nathan Cooper</MenuItem>
                   <MenuItem value="Owen Davis">Owen Davis</MenuItem>
                   <MenuItem value="Zoey Jenkins">Zoey Jenkins</MenuItem>
@@ -266,13 +230,13 @@ const FormComponent: React.FC = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <FormControl fullWidth size="small" required>
+              <FormControl fullWidth size="small">
                 <Typography variant="body2" sx={{ mb: 1 }}>Size</Typography>
                 <Select
                   defaultValue=""
                   label="Size"
-                  value={formData.size}
-                  onChange={(e) => handleChange('size', e.target.value)}
+                  value={size}
+                  onChange={(e) => setSize(e.target.value)}
                 >
                   <MenuItem value="" disabled>Choose...</MenuItem>
                   <MenuItem value="Small">Small</MenuItem>
@@ -288,10 +252,8 @@ const FormComponent: React.FC = () => {
                 size="small"
                 type="date"
                 InputLabelProps={{ shrink: true }}
-                value={formData.date ? formData.date.toISOString().split('T')[0] : ''}
-                // value={formData.date}
+                value={date}
                 onChange={handleDateChange}
-                required
               />
             </Grid>
             <Grid item xs={12}>
@@ -304,8 +266,8 @@ const FormComponent: React.FC = () => {
                 placeholder="Enter Project details"
                 variant="outlined"
                 required
-                value={formData.details}
-                onChange={(e) => handleChange('details', e.target.value)}
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
               />
             </Grid>
             {/* <Grid item xs={12}>
@@ -320,10 +282,7 @@ const FormComponent: React.FC = () => {
             <Grid item xs={12}>
               <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
                 <Button variant="contained" color="primary" type="submit">
-                  Add
-                </Button>
-                <Button variant="outlined" color="secondary">
-                  Cancel
+                  Edit Form
                 </Button>
               </Box>
             </Grid>
@@ -331,7 +290,5 @@ const FormComponent: React.FC = () => {
         </form>
       </Box>
     </Box>
-  );
-};
-
-export default FormComponent;
+  )
+}

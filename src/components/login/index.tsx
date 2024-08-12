@@ -9,13 +9,10 @@ import {
   Checkbox,
 } from "@mui/material";
 import { useState } from "react";
-import {
- 
-  Visibility,
-  VisibilityOff,
-} from "@mui/icons-material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+// import Cookies from "js-cookie";
 
 interface LoginProps {}
 
@@ -23,6 +20,7 @@ const Login: React.FC<LoginProps> = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
   const loginURL = import.meta.env.VITE_API_URL + "auth/login";
   const navigate = useNavigate();
@@ -39,18 +37,43 @@ const Login: React.FC<LoginProps> = () => {
     setShowPassword((prev) => !prev);
   };
 
+  const validateEmail = (email: string) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  }
+
   const handleLoginClick = async (e: FormEvent) => {
     e.preventDefault();
+    setError("");
+
+    if(!email || !password){
+      setError("Both email and password are required.");
+      return
+    }
+
+    if(!validateEmail(email)){
+      setError("Please enter a valid email address");
+      return;
+    }
+
     try{
       const response = await axios.post(loginURL, {
         email,
         password
       });
+
       console.log(response.data);
-      navigate("/");
+      localStorage.setItem("accessToken", response.data.token);
+      window.location.href = "/";
     }
-    catch(err) {
-      alert(`There was an error while login:${err}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch(err: any) {
+      if(err.response && err.response.status === 400){
+        setError("Invalid email or password.");
+      }
+      else{
+        setError("An error occurred while logging in.");
+      }
     }
   };
 
@@ -65,7 +88,6 @@ const Login: React.FC<LoginProps> = () => {
         alignItems: "center",
       }}
     >
-      
       <Box
         sx={{
           boxShadow: 1,
@@ -168,6 +190,19 @@ const Login: React.FC<LoginProps> = () => {
                 ),
               }}
             />
+            {error && (
+              <Typography
+                sx={{
+                  color: "red",
+                  fontSize: "14px",
+                  textAlign: "left",
+                  mt: 1,
+                  ml: 2
+                }}
+              >
+                {error}
+              </Typography>
+            )}
             <Box sx={{ mt: 0, px: 1 }}>
               <Grid container alignItems="center" justifyContent="space-between">
                 <Grid item sx={{ display: "flex", alignItems: "center" }}>

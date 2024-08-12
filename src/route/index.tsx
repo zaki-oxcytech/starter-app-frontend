@@ -5,6 +5,9 @@ import App from "../App";
 import Loading from "../components/common/Loading";
 import Dashboard from "../components/dashboard";
 import FormComponent from "../components/form/index";
+import ProtectedRoute from "./ProtectedRoute";
+import { EditItem } from "../components/dataTable/EditItem";
+// import Cookies from 'js-cookie';
 const DataTable = lazy(() => import("../components/dataTable"));
 const Login = lazy(() => import("../components/login"));
 const Signup = lazy(() => import("../components/login/subComponents/Signup"));
@@ -14,27 +17,68 @@ const ForgotPassword = lazy(
 const ResetPassword = lazy(() => import("../components/login/subComponents/ResetPassword"));
 const VerifyUser = lazy(() => import("../components/login/subComponents/VerifyUser"));
 
+const getAccessToken = () => {
+  const token = localStorage.getItem("accessToken");
+  return token;
+}
+
+const isAuthenticated = (): boolean => {
+  const token = getAccessToken();
+  return !!token;
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
+const Layout = () => {
+  return (
+    <>
+      <App />
+      {/* <Outlet /> */}
+    </>
+  )
+}
+
 const appRouter: RouteObject[] = [
   {
     path: "/",
-    element: <App />,
+    element: <Layout />,
     children: [
       {
         path: "/",
-        element: <FormComponent />,
+        element: (
+          <ProtectedRoute isAuthenticated={isAuthenticated()}>
+            <FormComponent />
+          </ProtectedRoute>
+        ),
       },
-
       {
         path: "/table",
         element: (
-          <Suspense fallback={<Loading />}>
-            <DataTable />
-          </Suspense>
+          <ProtectedRoute isAuthenticated={isAuthenticated()}>
+            <Suspense fallback={<Loading />}>
+              <DataTable />
+            </Suspense>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/dashboard",
-        element:<Dashboard />,
+        element: (
+          <ProtectedRoute isAuthenticated={isAuthenticated()}>
+            <Suspense fallback={<Loading />}>
+              <Dashboard />
+            </Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/editItem/:id",
+        element: (
+          <ProtectedRoute isAuthenticated={isAuthenticated()}>
+            <Suspense fallback={<Loading />}>
+              <EditItem />
+            </Suspense>
+          </ProtectedRoute>
+        ),
       }
     ],
   },
