@@ -84,7 +84,11 @@ const FormComponent: React.FC = () => {
   const handleSubmitForm = async (e: FormEvent) => {
     e.preventDefault();
     try{
-      const response = await axios.post(formUrl,formData);
+      const response = await axios.post(formUrl,formData, {
+        headers: {
+          'Content-Type': 'application/json' // Explicitly setting the Content-Type header
+        }
+      });
 
       console.log("response", response);
       setFormData({

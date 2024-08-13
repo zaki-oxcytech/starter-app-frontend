@@ -67,6 +67,10 @@ export const EditItem = () => {
             size: size,
             date: isoDate,
             details: details
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         })
         .then((response) => {
             console.log(response, "edit form Response");
