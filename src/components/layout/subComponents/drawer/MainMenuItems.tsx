@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import {
   AccountBalanceWalletOutlined as AccountBalanceWalletOutlinedIcon,
+  ChatBubbleOutlineRounded,
   CreditCardOutlined as CreditCardOutlinedIcon,
   DashboardCustomizeOutlined as DashboardCustomizeOutlinedIcon,
   MonitorHeartOutlined as MonitorHeartOutlinedIcon,
@@ -34,6 +35,10 @@ const mainMenuItems: MenuItem[] = [
     text: "Home",
     icon: <DashboardCustomizeOutlinedIcon />,
     route: "/",
+  },{
+    text: "Chat Support",
+    icon: <ChatBubbleOutlineRounded />,
+    route: "/chat-support",
   },
   {
     text: "Profile",

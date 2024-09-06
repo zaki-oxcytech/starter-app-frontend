@@ -9,11 +9,7 @@ import {
   Checkbox,
 } from "@mui/material";
 import { useState } from "react";
-import {
- 
-  Visibility,
-  VisibilityOff,
-} from "@mui/icons-material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -25,6 +21,7 @@ const Login: React.FC<LoginProps> = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const loginURL = import.meta.env.VITE_API_URL + "auth/login";
+
   const navigate = useNavigate();
 
   const handleForgotPassword = (): void => {
@@ -41,15 +38,14 @@ const Login: React.FC<LoginProps> = () => {
 
   const handleLoginClick = async (e: FormEvent) => {
     e.preventDefault();
-    try{
+    try {
       const response = await axios.post(loginURL, {
         email,
-        password
+        password,
       });
       console.log(response.data);
       navigate("/");
-    }
-    catch(err) {
+    } catch (err) {
       alert(`There was an error while login:${err}`);
     }
   };
@@ -65,7 +61,6 @@ const Login: React.FC<LoginProps> = () => {
         alignItems: "center",
       }}
     >
-      
       <Box
         sx={{
           boxShadow: 1,
@@ -76,7 +71,8 @@ const Login: React.FC<LoginProps> = () => {
           p: 3,
         }}
       >
-        <Typography variant="h5"
+        <Typography
+          variant="h5"
           sx={{
             p: "1rem",
             textAlign: "left",
@@ -94,7 +90,7 @@ const Login: React.FC<LoginProps> = () => {
             textAlign: "left",
             color: "#333533",
             fontSize: "18px",
-            fontWeight: '500',
+            fontWeight: "500",
             mb: "-20px",
           }}
         >
@@ -128,9 +124,8 @@ const Login: React.FC<LoginProps> = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               size="small"
-              
               placeholder="johndoe@gmail.com"
-              sx={{ px: 2, width: "90%", fontSize: "0.675rem"}}
+              sx={{ px: 2, width: "90%", fontSize: "0.675rem" }}
             />
             <Typography
               sx={{
@@ -145,7 +140,7 @@ const Login: React.FC<LoginProps> = () => {
               Password
             </Typography>
             <TextField
-            fullWidth
+              fullWidth
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -169,7 +164,11 @@ const Login: React.FC<LoginProps> = () => {
               }}
             />
             <Box sx={{ mt: 0, px: 1 }}>
-              <Grid container alignItems="center" justifyContent="space-between">
+              <Grid
+                container
+                alignItems="center"
+                justifyContent="space-between"
+              >
                 <Grid item sx={{ display: "flex", alignItems: "center" }}>
                   <Checkbox
                     sx={{
@@ -226,7 +225,7 @@ const Login: React.FC<LoginProps> = () => {
             </Box>
             <Box
               sx={{
-                px:1,
+                px: 1,
                 mt: 2,
                 mb: 3,
                 display: "flex",

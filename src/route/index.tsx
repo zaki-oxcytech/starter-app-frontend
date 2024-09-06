@@ -1,10 +1,10 @@
-// src/routes/index.js
 import { createBrowserRouter, RouteObject } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import App from "../App";
 import Loading from "../components/common/Loading";
 import Dashboard from "../components/dashboard";
 import FormComponent from "../components/form/index";
+
 const DataTable = lazy(() => import("../components/dataTable"));
 const Login = lazy(() => import("../components/login"));
 const Signup = lazy(() => import("../components/login/subComponents/Signup"));
@@ -13,6 +13,7 @@ const ForgotPassword = lazy(
 );
 const ResetPassword = lazy(() => import("../components/login/subComponents/ResetPassword"));
 const VerifyUser = lazy(() => import("../components/login/subComponents/VerifyUser"));
+const ChatSupport = lazy(() => import("../components/chatSupport/index"));
 
 const appRouter: RouteObject[] = [
   {
@@ -35,6 +36,14 @@ const appRouter: RouteObject[] = [
       {
         path: "/dashboard",
         element:<Dashboard />,
+      },
+      {
+        path: "/chat-support",
+        element:(
+          <Suspense fallback={<Loading />}>
+            <ChatSupport />
+          </Suspense>
+        ),
       }
     ],
   },
